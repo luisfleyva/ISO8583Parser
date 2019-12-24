@@ -29,22 +29,9 @@ namespace ISO8583
         {
             try
             {
-                if (fields.Length <= 0)
-                {
-                    throw new ArgumentNullException(nameof(fields));
-                }
-
                 Message message = Parse(ISO8583Message);
 
-                DataElement deField = message.DataElements[fields[0]];
-
-                for (int i = 1; i < fields.Length; i++)
-                {
-                    deField = deField[fields[i]];
-                }
-
-                fieldData = deField.GetFieldData();
-                return true;
+                return message.TryGetFieldData(out fieldData, fields);
             }
             catch
             {

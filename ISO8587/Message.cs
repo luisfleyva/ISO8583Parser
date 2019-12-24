@@ -32,6 +32,27 @@ namespace ISO8583
             }
         }
 
+        public bool TryGetFieldData(out string fieldData, params int[] fields)
+        {
+            try
+            {
+                DataElement deField = DataElements[fields[0]];
+
+                for (int i = 1; i < fields.Length; i++)
+                {
+                    deField = deField[fields[i]];
+                }
+
+                fieldData = deField.GetFieldData();
+                return true;
+            }
+            catch
+            {
+                fieldData = string.Empty;
+                return false;
+            }
+        }
+
 
         public override string ToString()
         {
