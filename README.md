@@ -1,2 +1,2 @@
 # ISO8583Parser
-C#/.Net parser for ISO8583 message format
+C#/.Net Core parser for ISO8583 message format
