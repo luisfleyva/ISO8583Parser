@@ -1,0 +1,16 @@
+C:\Users\luis\source\repos\ISO8583-1987\ISO8587-1987\obj\Debug\netcoreapp3.1\ISO8583.AssemblyInfoInputs.cache
+C:\Users\luis\source\repos\ISO8583-1987\ISO8587-1987\obj\Debug\netcoreapp3.1\ISO8583.AssemblyInfo.cs
+C:\Users\luis\source\repos\ISO8583-1987\ISO8587-1987\bin\Debug\netcoreapp3.1\ISO8583.deps.json
+C:\Users\luis\source\repos\ISO8583-1987\ISO8587-1987\bin\Debug\netcoreapp3.1\ISO8583.dll
+C:\Users\luis\source\repos\ISO8583-1987\ISO8587-1987\bin\Debug\netcoreapp3.1\ISO8583.pdb
+C:\Users\luis\source\repos\ISO8583-1987\ISO8587-1987\obj\Debug\netcoreapp3.1\ISO8583.dll
+C:\Users\luis\source\repos\ISO8583-1987\ISO8587-1987\obj\Debug\netcoreapp3.1\ISO8583.pdb
+C:\Users\luis\source\repos\ISO8583-1987\ISO8587-1987\obj\Debug\netcoreapp3.1\ISO8583.csprojAssemblyReference.cache
+D:\repos\ISO8583-1987\ISO8587\obj\Debug\netcoreapp3.1\ISO8583.AssemblyInfoInputs.cache
+D:\repos\ISO8583-1987\ISO8587\obj\Debug\netcoreapp3.1\ISO8583.AssemblyInfo.cs
+D:\repos\ISO8583-1987\ISO8587\obj\Debug\netcoreapp3.1\ISO8583.dll
+D:\repos\ISO8583-1987\ISO8587\obj\Debug\netcoreapp3.1\ISO8583.pdb
+D:\repos\ISO8583-1987\ISO8587\bin\Debug\netcoreapp3.1\ISO8583.deps.json
+D:\repos\ISO8583-1987\ISO8587\bin\Debug\netcoreapp3.1\ISO8583.dll
+D:\repos\ISO8583-1987\ISO8587\bin\Debug\netcoreapp3.1\ISO8583.pdb
+D:\repos\ISO8583-1987\ISO8587\obj\Debug\netcoreapp3.1\ISO8583.csprojAssemblyReference.cache
