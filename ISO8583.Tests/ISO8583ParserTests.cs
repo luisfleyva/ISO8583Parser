@@ -53,5 +53,41 @@ namespace ISO8583.Tests
 
         }
 
+        [Fact]
+        private void Can_Can_Get_Field_Data()
+        {
+            //Arrange
+            string ISO8583Message = "0200B2200000001000000000000000800000201" +
+            "234000000010000110722183012345606A5DFGR021ABCDEFGHIJ 1234567890";
+            DataElementsDefinition dataElementsDefinition = new DataDefinitionDictionary();
+            ISO8583Parser parser = new ISO8583Parser(dataElementsDefinition);
+
+            //Act
+            string DE3Data = string.Empty;
+            bool couldGetDEData = parser.TryGetFieldData(ISO8583Message, out DE3Data, 3);
+
+            string DE3SF1Data = string.Empty;
+            bool couldGetDE3SF1Data = parser.TryGetFieldData(ISO8583Message, out DE3SF1Data, 3, 1);
+
+            string DE3SF2Data = string.Empty;
+            bool couldGetDE3SF2Data = parser.TryGetFieldData(ISO8583Message, out DE3SF2Data, 3, 2);
+
+            string DE3SF3Data = string.Empty;
+            bool couldGetDE3SF3Data = parser.TryGetFieldData(ISO8583Message, out DE3SF3Data, 3, 3);
+
+            string DE44SF1Data = string.Empty;
+            bool couldGetDE44SF1Data = parser.TryGetFieldData(ISO8583Message, out DE44SF1Data, 44, 1);
+
+            //Assert
+            Assert.True(couldGetDE3SF1Data && couldGetDE3SF2Data && couldGetDE3SF3Data);
+            Assert.Equal("201234", DE3Data);
+            Assert.Equal("20", DE3SF1Data);
+            Assert.Equal("12", DE3SF2Data);
+            Assert.Equal("34", DE3SF3Data);
+            Assert.False(couldGetDE44SF1Data);
+            Assert.Equal(string.Empty, DE44SF1Data);
+
+        }
+
     }
 }

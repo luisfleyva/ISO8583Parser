@@ -48,7 +48,7 @@ namespace ISO8583
             }
             catch
             {
-                fieldData = null;
+                fieldData = string.Empty;
                 return false;
             }
         }
