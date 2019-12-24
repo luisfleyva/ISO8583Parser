@@ -1,24 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace ISO8583
 {
     public class BitMapCollection
     {
-        private List<BitMap> _bitMaps = new List<BitMap>();
+        private readonly Dictionary<int, BitMap> _bitMaps = new Dictionary<int, BitMap>();
 
-        public BitMap this[int number]
-        {
-            get
-            {
-                if (number < 1)
-                    throw new ArgumentOutOfRangeException(nameof(number));
-
-                return _bitMaps.Where(b => b.Number == number).Single();
-            }
-        }
+        public BitMap this[int number] => _bitMaps[number];
 
 
         public BitMapCollection(DataString firstBitmapString)
@@ -32,12 +22,14 @@ namespace ISO8583
             List<int> presentDataElements = new List<int>();
 
             int index = 0;
-            foreach (BitMap bitMap in _bitMaps)
+            foreach (BitMap bitMap in _bitMaps.Values)
             {
                 foreach (int dataElement in bitMap.PresentDataElements)
                 {
                     if (((64 * index) + 1) != dataElement)
+                    {
                         presentDataElements.Add(dataElement);
+                    }
                 }
 
                 index++;
@@ -56,26 +48,34 @@ namespace ISO8583
             AddBitMap(stringBitMap.ToBibnaryString());
         }
 
-
         public override string ToString()
         {
+            if (_bitMaps.Count == 0)
+            {
+                return string.Empty.PadLeft(16, '0');
+            }
+
             StringBuilder result = new StringBuilder();
 
-            if (_bitMaps.Count == 0)
-                return string.Empty.PadLeft(16, '0');
-
-            _bitMaps.ForEach(
-                bitMap => result.Append(bitMap.ToString())
-                );
+            foreach (BitMap bitMap in _bitMaps.Values)
+            {
+                result.Append(bitMap.ToString());
+            }
 
             return result.ToString();
         }
+
+
         private void AddBitMap(string binaryString)
         {
             if (binaryString.Length != 64)
+            {
                 throw new ArgumentException(nameof(BitMap));
+            }
 
-            _bitMaps.Add(new BitMap(binaryString, _bitMaps.Count + 1));
+            int bitMapNumber = _bitMaps.Count + 1;
+
+            _bitMaps.Add(bitMapNumber, new BitMap(binaryString, bitMapNumber));
         }
     }
 }
