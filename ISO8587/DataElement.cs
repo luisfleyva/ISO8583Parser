@@ -7,7 +7,8 @@ namespace ISO8583
     {
         public int Number { get; private set; }
         public DataDefinition Definition { get; private set; }
-        public DataString Data { get; private set; }
+
+        DataString _data;
         public DataElementCollection SubFields { get; private set; }
 
         public DataElement this[int subFieldNumber] => SubFields[subFieldNumber];
@@ -30,7 +31,7 @@ namespace ISO8583
             }
             else
             {
-                Data = data;
+                _data = data;
             }
         }
 
@@ -38,7 +39,7 @@ namespace ISO8583
         {
             return SubFields.HasValues() ?
                              SubFields.ToString() :
-                             Definition.GetFieldData(Data);
+                             Definition.GetFieldData(_data);
         }
 
         public override string ToString()
