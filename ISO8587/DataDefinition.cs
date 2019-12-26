@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace ISO8583
 {
-    public abstract class DataDefinition
+    public abstract class DataDefinition : IEquatable<DataDefinition>
     {
         private readonly Dictionary<int, DataDefinition> _subDefinitions;
         public IReadOnlyDictionary<int, DataDefinition> SubDefinitions => _subDefinitions;
@@ -63,6 +66,28 @@ namespace ISO8583
 
             return elementDef.GetAllData(elementData);
         }
+               
 
+        public bool Equals([AllowNull] DataDefinition other)
+        {
+            if (ElementType != other.ElementType)
+                return false;
+
+            if (_subDefinitions.Count != other.SubDefinitions.Count)
+                return false;
+
+            List<DataDefinition> thisDefinitions = _subDefinitions.Select(kvp => kvp.Value).ToList();
+            List<DataDefinition> otherDefinitions = other.SubDefinitions.Select(kvp => kvp.Value).ToList();
+
+            for (int i = 0; i < _subDefinitions.Count; i++)
+            {
+                if (!thisDefinitions[i].Equals(otherDefinitions[i]))
+                    return false;
+            }
+
+            return  IsEqualTo(other);
+        }
+
+        protected abstract bool IsEqualTo(DataDefinition other);
     }
 }

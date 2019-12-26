@@ -24,7 +24,7 @@ namespace ISO8583.Tests
 
 
             //Act
-            DataElement mfDE = new DataElement(def, elementData, 33);
+            DataElement mfDE = new DataElement(999, def, elementData);
 
             //Assert
             Assert.Equal("11", mfDE[1].GetFieldData());

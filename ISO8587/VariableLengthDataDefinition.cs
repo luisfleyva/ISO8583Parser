@@ -61,6 +61,16 @@ namespace ISO8583
             return (int)LenthType;
         }
 
+        protected override bool IsEqualTo(DataDefinition other)
+        {
+            if (!(other is VariableLengthDataDefinition))
+                return false;
+
+            VariableLengthDataDefinition theOther = other as VariableLengthDataDefinition;
+
+            return LenthType == theOther.LenthType && _maxLength == theOther._maxLength;
+        }
+
         private bool IsValidSubFieldsLength()
         {
             if (HasSubfields())
@@ -76,5 +86,7 @@ namespace ISO8583
 
             return true;
         }
+
+        
     }
 }

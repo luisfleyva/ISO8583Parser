@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ISO8583
 {
@@ -9,14 +10,14 @@ namespace ISO8583
         public DataDefinition Definition { get; private set; }
 
         DataString _data;
-        public DataElementCollection SubFields { get; private set; }
+        public DataElementCollection SubElements { get; private set; }
 
-        public DataElement this[int subFieldNumber] => SubFields[subFieldNumber];
+        public DataElement this[int subFieldNumber] => SubElements[subFieldNumber];
 
-        public DataElement(DataDefinition dataDefinition, DataString data, int field)
+        public DataElement(int number, DataDefinition dataDefinition, DataString data)
         {
-            SubFields = new DataElementCollection();
-            Number = field;
+            SubElements = new DataElementCollection();
+            Number = number;
             Definition = dataDefinition;
 
             if (dataDefinition.HasSubfields())
@@ -26,7 +27,7 @@ namespace ISO8583
                     int fieldNumber = kvp.Key;
                     DataDefinition fieldDefinition = kvp.Value;
                     DataString fieldData = dataDefinition.GetSubFieldData(data, fieldNumber);
-                    SubFields.AddOrReplaceDataElement(new DataElement(fieldDefinition, fieldData, fieldNumber));
+                    SubElements.AddOrReplaceDataElement(new DataElement(fieldNumber, fieldDefinition, fieldData));
                 }
             }
             else
@@ -35,10 +36,29 @@ namespace ISO8583
             }
         }
 
+        public DataElement(int number, DataDefinition dataDefinition, HashSet<DataElement> subElements)
+        {
+            SubElements = new DataElementCollection();
+            Number = number;
+            Definition = dataDefinition;
+
+            if (AreValidSubElements(dataDefinition, subElements))
+            {
+                foreach (DataElement dataElement in subElements)
+                {
+                    SubElements.AddOrReplaceDataElement(dataElement);
+                }
+            }
+            else
+            {
+                throw new ArgumentException("DataDefinition does not match subElements definition.");
+            }
+        }
+
         public string GetFieldData()
         {
-            return SubFields.HasValues() ?
-                             SubFields.ToString() :
+            return SubElements.HasValues() ?
+                             SubElements.ToString() :
                              Definition.GetFieldData(_data);
         }
 
@@ -67,6 +87,20 @@ namespace ISO8583
         public override int GetHashCode()
         {
             return Number.GetHashCode();
+        }
+
+        private bool AreValidSubElements(DataDefinition definition, HashSet<DataElement> subEmelemnts)
+        {
+            if (definition.SubDefinitions.Count != subEmelemnts.Count)
+                return false;
+
+            foreach (DataElement de in subEmelemnts)
+            {
+                if (!definition.SubDefinitions[de.Number].Equals(de.Definition))
+                    return false;
+            }
+
+            return true;
         }
     }
 }

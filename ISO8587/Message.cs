@@ -119,12 +119,11 @@ namespace ISO8583
 
                     try
                     {
-
                         DataString data = dataDef.GetAllData(dataElementsString, ref dataElementsReaderIndex);
 
                         dataElementsString = dataElementsString.SubString(dataElementsReaderIndex);
 
-                        DataElements.AddOrReplaceDataElement(new DataElement(dataDef, data, de));
+                        DataElements.AddOrReplaceDataElement(new DataElement(de, dataDef, data));
                     }
                     catch (Exception ex)
                     {

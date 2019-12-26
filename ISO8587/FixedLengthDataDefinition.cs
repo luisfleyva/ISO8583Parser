@@ -35,6 +35,14 @@ namespace ISO8583
             return Length;
         }
 
+        protected override bool IsEqualTo(DataDefinition other)
+        {
+            if (!(other is FixedLengthDataDefinition))
+                return false;
+
+            return Length == (other as FixedLengthDataDefinition).Length;
+        }
+
         private bool IsValidSubFieldsLength()
         {
             if (HasSubfields())
