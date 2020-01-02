@@ -9,7 +9,7 @@ namespace ISO8583.Tests
         private void Can_Create_Multifield_DE()
         {
             //Arrange
-            DataString elementData = new DataString("08114212233");
+            DataString elementData = new DataString("09114212233");
             DataDefinition def = new VariableLengthDataDefinition(DataType.n_numeric, VariableLenthType.LLVAR, 20,
                 new Dictionary<int, DataDefinition>() {
                     { 1, new FixedLengthDataDefinition(DataType.n_numeric, 2) },

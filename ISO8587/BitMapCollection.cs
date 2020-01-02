@@ -16,6 +16,31 @@ namespace ISO8583
             AddBitMap(firstBitmapString);
         }
 
+        public BitMapCollection()
+        {
+            _bitMaps[1] = new BitMap(1);
+        }
+
+        public void SetPresentDataElement(int deNumber)
+        {
+            int bitMapNumber = 1;
+
+            int aux = deNumber;
+            while (aux > 64)
+            {
+                aux = aux - 64;
+                bitMapNumber++;
+            }
+            
+            while (Count() < bitMapNumber)
+            {
+                int number = Count() + 1;
+                _bitMaps[number - 1].AddPresentDataElement((64 * (Count() -1)) + 1);
+                _bitMaps.Add(number, new BitMap(number));                
+            }
+
+            _bitMaps[bitMapNumber].AddPresentDataElement(deNumber);
+        }
 
         public List<int> GetPresentDataElements()
         {
@@ -56,11 +81,8 @@ namespace ISO8583
             }
 
             StringBuilder result = new StringBuilder();
-
-            foreach (BitMap bitMap in _bitMaps.Values)
-            {
-                result.Append(bitMap.ToString());
-            }
+            foreach (BitMap bitMap in _bitMaps.Values)            
+                result.Append(bitMap.ToString());            
 
             return result.ToString();
         }

@@ -66,7 +66,8 @@ namespace ISO8583
 
             return elementDef.GetAllData(elementData);
         }
-               
+
+        public abstract string FillWithLength(string data);
 
         public bool Equals([AllowNull] DataDefinition other)
         {

@@ -24,10 +24,13 @@ namespace ISO8583
             return data.SubString(0, Length);
         }
 
+        public override string FillWithLength(string data)
+        {
+            return data;
+        }
         public override string GetFieldData(DataString data)
         {
-            int iref = 0;
-            return GetAllData(data, ref iref).ToString();
+            return GetAllData(data).ToString();
         }
 
         public override int GetLength()

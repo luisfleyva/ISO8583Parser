@@ -61,6 +61,15 @@ namespace ISO8583
             return (int)LenthType;
         }
 
+        public override string FillWithLength(string data)
+        {
+            int lenthFieldLength = (int)LenthType;
+            int fieldLength = data.Length;
+            string append = fieldLength.ToString().PadLeft(lenthFieldLength, '0');
+
+            return append + data;
+        }
+
         protected override bool IsEqualTo(DataDefinition other)
         {
             if (!(other is VariableLengthDataDefinition))

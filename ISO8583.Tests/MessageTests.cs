@@ -58,5 +58,56 @@ namespace ISO8583.Tests
             
         }
 
+
+
+        [Fact]
+        void Can_Create_Empty_Message()
+        {
+            //Arrange
+            DataElementsDefinition dataElementsDefinition = new DataDefinitionDictionary();
+
+            //Act
+            Message message = new Message(new MessageTypeIdentifier("0800"), dataElementsDefinition);
+            string messageString = message.ToString();
+
+            //Assert
+            Assert.Equal("08000000000000000000", messageString);
+        }
+
+
+        [Fact]
+        void Can_Add_Data_Element()
+        {
+            //Arrange
+            DataElementsDefinition dataElementsDefinition = new DataDefinitionDictionary();
+            DataString elementData = new DataString("09114212233");
+            DataDefinition def = new VariableLengthDataDefinition(DataType.n_numeric, VariableLenthType.LLVAR, 20,
+                new Dictionary<int, DataDefinition>() {
+                    { 1, new FixedLengthDataDefinition(DataType.n_numeric, 2) },
+                    { 2, new VariableLengthDataDefinition(DataType.n_numeric,VariableLenthType.LVAR, 4,
+                          new Dictionary<int, DataDefinition> {
+                                { 1, new FixedLengthDataDefinition(DataType.n_numeric, 2) },
+                                { 2, new FixedLengthDataDefinition(DataType.n_numeric, 2) }
+                           }
+                    )},
+                    { 3, new FixedLengthDataDefinition(DataType.n_numeric, 2) }
+                });
+            DataElement mfDE74 = new DataElement(74, def, elementData);
+            DataElement mfDE7 = new DataElement(7, def, elementData);
+            Message message = new Message(new MessageTypeIdentifier("0800"), dataElementsDefinition);
+            
+            //Act
+            message.AddOrReplaceDataElement(mfDE74);
+            message.AddOrReplaceDataElement(mfDE7);
+            List<int> des = message.BitMaps.GetPresentDataElements();
+            string DE74Data = string.Empty;
+            message.TryGetFieldData(out DE74Data, 74, 2, 1);
+
+            //Assert
+            Assert.Contains(74, des);
+            Assert.Contains(7, des);
+            Assert.Equal("21", DE74Data);
+        }
+
     }
 }

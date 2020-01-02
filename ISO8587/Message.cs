@@ -32,6 +32,13 @@ namespace ISO8583
             }
         }
 
+        public Message(MessageTypeIdentifier mti, DataElementsDefinition dataElementDefinition)
+        {
+            MessageTypeIdentifier = mti;
+            BitMaps = new BitMapCollection();
+            DataElements = new DataElementCollection();
+        }
+
         public bool TryGetFieldData(out string fieldData, params int[] fields)
         {
             try
@@ -53,6 +60,13 @@ namespace ISO8583
             }
         }
 
+
+        public void AddOrReplaceDataElement(DataElement dataElement)
+        {
+            int number = dataElement.Number;
+            BitMaps.SetPresentDataElement(number);
+            DataElements.AddOrReplaceDataElement(dataElement);
+        }
 
         public override string ToString()
         {

@@ -23,6 +23,20 @@ namespace ISO8583
             _presentDataElements = GetPresentDataElements(bitMapBinaryString, number);
         }
 
+        public BitMap(int number)
+        {
+            Number = number;
+            _presentDataElements = new List<int>();
+        }
+
+        public void AddPresentDataElement(int dataElementNumber)
+        {
+            if (dataElementNumber > (64 * Number) || dataElementNumber < ((64 * Number) - 64))
+                throw new ArgumentOutOfRangeException(nameof(dataElementNumber));
+
+            _presentDataElements.Add(dataElementNumber);
+        }
+
         public DataString ToISOString()
         {
             return DataString.FromBinaryString(ToBinaryString());

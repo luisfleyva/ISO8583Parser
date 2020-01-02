@@ -66,17 +66,7 @@ namespace ISO8583
         {
             string toString = GetFieldData();
 
-            string append = string.Empty;
-
-            if (Definition is VariableLengthDataDefinition)
-            {
-                VariableLengthDataDefinition dataDefinition = Definition as VariableLengthDataDefinition;
-                int lenthFieldLength = (int)dataDefinition.LenthType;
-                int fieldLength = toString.Length;
-                append = fieldLength.ToString().PadLeft(lenthFieldLength, '0');
-            }
-
-            return append + toString;
+            return Definition.FillWithLength(toString);
         }
 
         public bool Equals(DataElement other)
