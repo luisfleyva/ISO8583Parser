@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Xunit;
+﻿using Xunit;
 
 namespace ISO8583.Tests
 {
@@ -15,14 +12,14 @@ namespace ISO8583.Tests
             ISO8583Builder builder = new ISO8583Builder("0200", dataElementsDefinition);
 
             //Act
-            builder.AddOrReplaceField("20", 3, 1);
-            builder.AddOrReplaceField("12", 3, 2);
-            builder.AddOrReplaceField("34", 3, 3);
-            builder.AddOrReplaceField("000000010000", 4);
-            builder.AddOrReplaceField("1107221830", 7);
-            builder.AddOrReplaceField("123456", 11);
-            builder.AddOrReplaceField("A5DFGR", 44);
-            builder.AddOrReplaceField("ABCDEFGHIJ 1234567890", 105);
+            builder.SetField("20", 3, 1);
+            builder.SetField("12", 3, 2);
+            builder.SetField("34", 3, 3);
+            builder.SetField("000000010000", 4);
+            builder.SetField("1107221830", 7);
+            builder.SetField("123456", 11);
+            builder.SetField("A5DFGR", 44);
+            builder.SetField("ABCDEFGHIJ 1234567890", 105);
 
             Message message = builder.Build();
 

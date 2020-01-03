@@ -22,7 +22,8 @@ namespace ISO8583
             }
             catch (Exception ex)
             {
-                throw new Exception("Incorrectly formated ISO5883Messsage.", ex);
+                throw new Exception($"Error: ISO8583Parser.Parse(" +
+                    $"string ISO8583Message: {ISO8583Message})", ex);
             }
         }
         public bool TryGetFieldData(string ISO8583Message, out string fieldData, params int[] fields)

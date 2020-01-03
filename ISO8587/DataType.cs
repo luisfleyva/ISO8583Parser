@@ -11,6 +11,6 @@
         ans_alphaNumericSpecial,
         b_binary,
         z_trac2OrTrack3,
-        x_CreditOrDebit_CD,
+        x_CreditOrDebit_CD
     }
 }

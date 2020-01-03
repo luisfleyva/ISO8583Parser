@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace ISO8583
 {
@@ -11,51 +10,76 @@ namespace ISO8583
         DataElementsDefinition _dataElementsDefinition;
         Dictionary<int, Node> messageTree = new Dictionary<int, Node>();
 
+
         public ISO8583Builder(string mti, DataElementsDefinition dataElementsDefinition)
             : this(new MessageTypeIdentifier(mti), dataElementsDefinition)
         { }
 
         public ISO8583Builder(MessageTypeIdentifier mti, DataElementsDefinition dataElementsDefinition)
         {
-            _messageTypeIdentifier = mti;
-            _dataElementsDefinition = dataElementsDefinition;
+            _messageTypeIdentifier = mti
+                ?? throw new ArgumentNullException(nameof(MessageTypeIdentifier));
+
+            _dataElementsDefinition = dataElementsDefinition
+                ?? throw new ArgumentNullException(nameof(DataElementsDefinition)); ;
         }
 
-        public void AddOrReplaceField(string data, params int[] field)
+
+        public void SetField(string data, params int[] field)
         {
-            if (field.Length <= 0)
-                throw new ArgumentNullException(nameof(field));
-
-            if (field.Length == 1)
-                messageTree[field[0]] = new DataNode(field[0], data);
-            else
+            try
             {
-                MultiNode node = (messageTree.ContainsKey(field[0]) && messageTree[field[0]] is MultiNode) 
-                    ? messageTree[field[0]] as MultiNode 
-                    : new MultiNode(field[0]);
+                if (field.Length <= 0)
+                    throw new ArgumentNullException(nameof(field));
 
-                messageTree[field[0]] = CreateField(node , data, field.Skip(1).ToArray());              
+                int first = field[0];
+                int[] rest = field.Skip(1).ToArray();
+
+                if (field.Length == 1)
+                    messageTree[first] = new DataNode(first, data);
+                else
+                {
+                    MultiNode node = (messageTree.ContainsKey(first) && messageTree[first] is MultiNode)
+                        ? messageTree[first] as MultiNode
+                        : new MultiNode(first);
+
+                    messageTree[first] = CreateField(node, data, rest);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error: ISO8583Builder.AddOrReplaceField(" +
+                    $"string data: {data}, " +
+                    $"params int[] field: {field.ConvertToString()})", ex);
             }
         }
 
         public Message Build()
-        {          
-            Message message = new Message(_messageTypeIdentifier, _dataElementsDefinition);
-
-            foreach (var kvp in messageTree)
+        {
+            try
             {
-                if (_dataElementsDefinition.ContainsElementDefinition(kvp.Key))
-                {
-                    DataElement dataElement = CreateDataElement(kvp.Value,
-                                                                _dataElementsDefinition.GetDataDefinition(kvp.Key));
-                    message.AddOrReplaceDataElement(dataElement);
-                }
-                else
-                    throw new Exception($"Missing definition, DE: {kvp.Key}");
-            }
+                Message message = new Message(_messageTypeIdentifier, _dataElementsDefinition);
 
-            return message;
+                foreach (var kvp in messageTree)
+                {
+                    if (_dataElementsDefinition.ContainsElementDefinition(kvp.Key))
+                    {
+                        DataElement dataElement = CreateDataElement(kvp.Value,
+                                                                    _dataElementsDefinition.GetDataDefinition(kvp.Key));
+                        message.AddOrReplaceDataElement(dataElement);
+                    }
+                    else
+                        throw new Exception($"Missing definition, DE: {kvp.Key}");
+                }
+
+                return message;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error: ISO8583Builder.Build()", ex);
+            }
         }
+
 
         private MultiNode CreateField(MultiNode node, string data, params int[] field)
         {
@@ -81,7 +105,7 @@ namespace ISO8583
                 MultiNode multiNode = node as MultiNode;
 
                 if (multiNode.Childs.Count != definition.SubDefinitions?.Count)
-                    throw new Exception("Node childs Count() must be equal to SubDefinitions Count()");
+                    throw new Exception("Node childs Count must be equal to SubDefinitions Count.");
 
                 HashSet<DataElement> subDataElements = new HashSet<DataElement>();
                 foreach (var kvp in multiNode.Childs)
