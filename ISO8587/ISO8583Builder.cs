@@ -6,9 +6,9 @@ namespace ISO8583
 {
     public class ISO8583Builder
     {
-        MessageTypeIdentifier _messageTypeIdentifier;
-        DataElementsDefinition _dataElementsDefinition;
-        Dictionary<int, Node> messageTree = new Dictionary<int, Node>();
+        private readonly MessageTypeIdentifier _messageTypeIdentifier;
+        private readonly DataElementsDefinition _dataElementsDefinition;
+        private readonly Dictionary<int, Node> messageTree = new Dictionary<int, Node>();
 
 
         public ISO8583Builder(string mti, DataElementsDefinition dataElementsDefinition)
@@ -30,18 +30,22 @@ namespace ISO8583
             try
             {
                 if (field.Length <= 0)
+                {
                     throw new ArgumentNullException(nameof(field));
+                }
 
                 int first = field[0];
                 int[] rest = field.Skip(1).ToArray();
 
                 if (field.Length == 1)
-                    messageTree[first] = new DataNode(first, data);
+                {
+                    messageTree[first] = new Node(first, data);
+                }
                 else
                 {
-                    MultiNode node = (messageTree.ContainsKey(first) && messageTree[first] is MultiNode)
-                        ? messageTree[first] as MultiNode
-                        : new MultiNode(first);
+                    Node node = (messageTree.ContainsKey(first))
+                                ? messageTree[first]
+                                : new Node(first);
 
                     messageTree[first] = CreateField(node, data, rest);
                 }
@@ -60,7 +64,7 @@ namespace ISO8583
             {
                 Message message = new Message(_messageTypeIdentifier, _dataElementsDefinition);
 
-                foreach (var kvp in messageTree)
+                foreach (KeyValuePair<int, Node> kvp in messageTree)
                 {
                     if (_dataElementsDefinition.ContainsElementDefinition(kvp.Key))
                     {
@@ -69,7 +73,9 @@ namespace ISO8583
                         message.AddOrReplaceDataElement(dataElement);
                     }
                     else
+                    {
                         throw new Exception($"Missing definition, DE: {kvp.Key}");
+                    }
                 }
 
                 return message;
@@ -81,34 +87,39 @@ namespace ISO8583
         }
 
 
-        private MultiNode CreateField(MultiNode node, string data, params int[] field)
+        private Node CreateField(Node node, string data, params int[] field)
         {
             if (field.Length == 1)
-                node.AddOrReplaceNode(new DataNode(field[0], data));
+            {
+                node.AddOrReplaceNode(new Node(field[0], data));
+            }
             else
-                node.AddOrReplaceNode(CreateField(new MultiNode(field[0]),
+            {
+                node.AddOrReplaceNode(CreateField(new Node(field[0]),
                                                   data,
                                                   field.Skip(1).ToArray()));
+            }
+
             return node;
         }
 
         private DataElement CreateDataElement(Node node, DataDefinition definition)
         {
-            if (node is DataNode)
+            if (!node.HasChilds())
             {
-                DataNode dataNode = node as DataNode;
-                string allData = definition.FillWithLength(dataNode.Data);
-                return new DataElement(dataNode.Number, definition, new DataString(allData));
+                string allData = definition.FillWithLength(node.Data);
+                return new DataElement(node.Number, definition, new DataString(allData));
             }
             else
             {
-                MultiNode multiNode = node as MultiNode;
 
-                if (multiNode.Childs.Count != definition.SubDefinitions?.Count)
+                if (node.Childs.Count != definition.SubDefinitions?.Count)
+                {
                     throw new Exception("Node childs Count must be equal to SubDefinitions Count.");
+                }
 
                 HashSet<DataElement> subDataElements = new HashSet<DataElement>();
-                foreach (var kvp in multiNode.Childs)
+                foreach (KeyValuePair<int, Node> kvp in node.Childs)
                 {
                     DataElement innerDataElement = CreateDataElement(kvp.Value,
                         definition.SubDefinitions[kvp.Key]);
@@ -116,39 +127,43 @@ namespace ISO8583
                     subDataElements.Add(innerDataElement);
                 }
 
-                return new DataElement(multiNode.Number, definition, subDataElements);
+                return new DataElement(node.Number, definition, subDataElements);
             }
         }
 
     }
 
-    internal abstract class Node
+    internal class Node
     {
         public int Number { get; private set; }
+        public string Data { get; private set; }
+
+        private readonly Dictionary<int, Node> _childs;
+        public IReadOnlyDictionary<int, Node> Childs => _childs;
+
+
         public Node(int number)
         {
+            _childs = new Dictionary<int, Node>();
             Number = number;
         }
-    }
-    internal class MultiNode : Node
-    {
-        Dictionary<int, Node> _childs;
-        public IReadOnlyDictionary<int, Node> Childs => _childs;
-        public MultiNode(int number) : base(number)
+        public Node(int number, string data) : this(number)
         {
-            _childs = new Dictionary<int, Node>();
+            if (string.IsNullOrEmpty(data))
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
+            Data = data;
+        }
+
+        public bool HasChilds()
+        {
+            return _childs.Count != 0;
         }
         public void AddOrReplaceNode(Node node)
         {
             _childs[node.Number] = node;
-        }
-    }
-    internal class DataNode : Node
-    {
-        public string Data { get; private set; }
-        public DataNode(int number, string data) : base(number)
-        {
-            Data = data;
         }
     }
 }
